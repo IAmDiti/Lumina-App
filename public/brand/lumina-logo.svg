@@ -1,0 +1,23 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="dotGrad" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#c7d2fe" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </radialGradient>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="26" result="blur" />
+    </filter>
+  </defs>
+
+  <!-- Solid black circular badge -->
+  <circle cx="512" cy="512" r="512" fill="#000000" />
+
+  <!-- Ring -->
+  <circle cx="512" cy="512" r="300" fill="rgba(99,102,241,0.15)" stroke="rgba(129,140,248,0.55)" stroke-width="10" />
+
+  <!-- Glow behind the dot -->
+  <circle cx="512" cy="512" r="130" fill="#818cf8" opacity="0.55" filter="url(#glow)" />
+
+  <!-- Core dot -->
+  <circle cx="512" cy="512" r="108" fill="url(#dotGrad)" />
+</svg>
