@@ -183,6 +183,17 @@ export function LiveDemo() {
             </div>
             {activeExample && <ResultView result={activeExample} />}
           </>
+        ) : sandboxResult ? (
+          <>
+            <ResultView result={sandboxResult} live />
+            <p className="animate-fade-in mt-5 rounded-xl border border-indigo-400/20 bg-indigo-500/[0.06] px-4 py-3 text-center text-sm text-zinc-300">
+              That&apos;s today&apos;s free sandbox reflection used.{" "}
+              <Link href="/login" className="text-indigo-300 hover:text-indigo-200">
+                Create a free account
+              </Link>{" "}
+              to keep reflecting, every day.
+            </p>
+          </>
         ) : (
           <>
             <label htmlFor="sandbox-entry" className="sr-only">
@@ -200,7 +211,7 @@ export function LiveDemo() {
             />
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="font-mono text-xs text-zinc-600">
-                {draft.length}/{MAX_LEN} · nothing here is saved
+                {draft.length}/{MAX_LEN} · one free try a day, nothing here is saved
               </span>
               <button
                 type="button"
@@ -218,11 +229,10 @@ export function LiveDemo() {
                 {error}
               </p>
             )}
-            {sandboxResult && <ResultView result={sandboxResult} live />}
           </>
         )}
 
-        {(activeExample || sandboxResult) && (
+        {mode === "example" && activeExample && (
           <p className="animate-fade-in mt-5 border-t border-zinc-800 pt-4 text-center text-sm text-zinc-400">
             This is one entry, once.{" "}
             <Link href="/login" className="text-indigo-300 hover:text-indigo-200">

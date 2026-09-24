@@ -14,7 +14,7 @@ const BodySchema = z.object({
     .max(500, "Keep the sandbox entry under 500 characters."),
 });
 
-const LIMIT = 5;
+const LIMIT = 1;
 const WINDOW_HOURS = 24;
 
 function error(message: string, status: number) {
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   }
   if ((count ?? 0) >= LIMIT) {
     return error(
-      "You've tried the sandbox a few times already today — create a free account to keep reflecting.",
+      "You've used today's free sandbox reflection — create a free account to keep reflecting.",
       429,
     );
   }
