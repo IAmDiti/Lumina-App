@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { PricingToggle } from "@/components/PricingToggle";
 import { buildCheckoutUrl } from "@/lib/lumina/checkout";
 import { PLAN_LIMITS, getPlan } from "@/lib/subscription";
 import { getUserId } from "@/lib/supabase/server";
@@ -29,7 +30,8 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
   const justUpgraded = params.upgraded === "1";
 
   const plan = await getPlan(supabase, userId, email);
-  const checkoutUrl = plan === "paid" ? null : buildCheckoutUrl(userId, email ?? "");
+  const checkoutUrlMonthly = plan === "paid" ? null : buildCheckoutUrl(userId, email ?? "", "monthly");
+  const checkoutUrlAnnual = plan === "paid" ? null : buildCheckoutUrl(userId, email ?? "", "annual");
 
   return (
     <>
@@ -86,26 +88,19 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
               ))}
             </ul>
 
-            {plan === "paid" ? (
-              <p className="mt-6 rounded-lg bg-indigo-500/10 px-3 py-2 text-center text-xs text-indigo-200 ring-1 ring-indigo-500/20">
-                Your current plan
-              </p>
-            ) : checkoutUrl ? (
-              <a
-                href={checkoutUrl}
-                className="mt-6 flex w-full items-center justify-center rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-950/40 transition-all duration-150 hover:bg-indigo-400 hover:shadow-indigo-500/30 active:scale-[0.98]"
-              >
-                Upgrade with Lemon Squeezy
-              </a>
-            ) : (
-              <p className="mt-6 rounded-lg bg-zinc-900/70 px-3 py-2 text-center text-xs text-zinc-500">
-                Billing isn&apos;t configured yet.
-              </p>
-            )}
+            <div className="mt-6">
+              {plan === "paid" ? (
+                <p className="rounded-lg bg-indigo-500/10 px-3 py-2 text-center text-xs text-indigo-200 ring-1 ring-indigo-500/20">
+                  Your current plan
+                </p>
+              ) : (
+                <PricingToggle monthlyUrl={checkoutUrlMonthly} annualUrl={checkoutUrlAnnual} />
+              )}
+            </div>
           </div>
         </div>
 
-        {plan !== "paid" && checkoutUrl && (
+        {plan !== "paid" && (checkoutUrlMonthly || checkoutUrlAnnual) && (
           <p className="mt-6 text-center text-xs leading-relaxed text-zinc-600">
             Billed by Lemon Squeezy, our merchant of record. Subscriptions renew automatically
             until cancelled. By upgrading you agree to our{" "}
