@@ -45,3 +45,15 @@ export interface Synthesis {
   entry_count: number;
   created_at: string;
 }
+
+export type FeedbackType = "idea" | "bug";
+
+export interface Feedback {
+  id: string;
+  user_id: string | null;
+  type: FeedbackType;
+  message: string;
+  page_url: string | null;
+  resolved: boolean;
+  created_at: string;
+}
