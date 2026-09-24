@@ -16,7 +16,7 @@ const EXAMPLES: Result[] = [
     entry:
       "I keep saying yes to things I don't want to do because I'm scared of how people will react if I say no.",
     response:
-      "You're describing your \"no\" as a risk to manage rather than a boundary you're allowed to hold — what are you actually afraid will happen if you disappoint someone?",
+      "You're describing your \"no\" as a risk to manage rather than a boundary you're allowed to hold. What are you actually afraid will happen if you disappoint someone?",
     insights: {
       detected_patterns: ["Fear of disappointing others"],
       core_values_mentioned: ["harmony"],
@@ -26,7 +26,7 @@ const EXAMPLES: Result[] = [
   {
     entry: "Finished the project at 2am again. I told myself I'd stop doing this to myself but here we are.",
     response:
-      "You noticed the pattern in the same breath you repeated it — what does finishing at 2am actually protect you from feeling?",
+      "You noticed the pattern in the same breath you repeated it. What does finishing at 2am actually protect you from feeling?",
     insights: {
       detected_patterns: ["Overworking when anxious"],
       core_values_mentioned: ["achievement"],
@@ -36,7 +36,7 @@ const EXAMPLES: Result[] = [
   {
     entry: "My sister said something small and I've been replaying it for three days like it's a big deal.",
     response:
-      "Three days is a long time to carry something \"small\" — what does it mean about you if what she said turns out to be true?",
+      "Three days is a long time to carry something \"small.\" What does it mean about you if what she said turns out to be true?",
     insights: {
       detected_patterns: ["Rumination after criticism"],
       core_values_mentioned: ["belonging"],

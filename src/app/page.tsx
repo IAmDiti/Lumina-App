@@ -6,47 +6,16 @@ import { Reveal } from "@/components/Reveal";
 import { TrustStrip } from "@/components/TrustStrip";
 import { getUserId } from "@/lib/supabase/server";
 
-function PencilIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
-  );
-}
-
-function QuestionIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
-      <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 1.8-2.5 3.5" />
-      <path d="M12 15.5v.01" />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-
 const STEPS = [
   {
-    icon: PencilIcon,
     title: "Write raw",
     body: "No prompts, no streaks, no formatting. Just the thought as it is.",
   },
   {
-    icon: QuestionIcon,
     title: "Get one good question",
     body: "The Active Listener reflects back what it hears and asks the one question worth sitting with.",
   },
   {
-    icon: EyeIcon,
     title: "Watch yourself emerge",
     body: "Your Identity Board quietly tracks the values, triggers and emotional patterns that keep showing up.",
   },
@@ -106,18 +75,10 @@ export default async function Home() {
         <div className="grid gap-4 sm:grid-cols-3">
           {STEPS.map((step, i) => (
             <Reveal key={step.title} delay={i * 120}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-indigo-400/30 hover:bg-zinc-900/50 hover:shadow-xl hover:shadow-indigo-950/40">
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -top-6 -right-4 font-serif text-8xl text-zinc-900/80 transition-colors duration-200 group-hover:text-indigo-950"
-                >
-                  {i + 1}
-                </span>
-                <span className="relative grid size-10 place-items-center rounded-full bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-400/25 transition-transform duration-200 group-hover:scale-110">
-                  <step.icon />
-                </span>
-                <h2 className="relative mt-4 font-serif text-xl text-white">{step.title}</h2>
-                <p className="relative mt-2 text-sm leading-relaxed text-zinc-300">{step.body}</p>
+              <div className="h-full rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-indigo-400/30 hover:bg-zinc-900/50 hover:shadow-xl hover:shadow-indigo-950/40">
+                <span className="font-mono text-xs text-indigo-300/70">{String(i + 1).padStart(2, "0")}</span>
+                <h2 className="mt-2 font-serif text-xl text-white">{step.title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-300">{step.body}</p>
               </div>
             </Reveal>
           ))}
