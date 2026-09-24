@@ -56,8 +56,15 @@ function Chip({ children, tone = "zinc" }: { children: React.ReactNode; tone?: "
   return <span className={`rounded-full px-2.5 py-0.5 text-xs ring-1 ${styles}`}>{children}</span>;
 }
 
+function capitalize(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function ResultView({ result, live }: { result: Result; live?: boolean }) {
   const { insights } = result;
+  const value = insights.core_values_mentioned[0];
+  const pattern = insights.detected_patterns[0];
+
   return (
     <div className="animate-fade-in mt-5 space-y-4">
       <div className="rounded-xl border-l-2 border-indigo-400/70 bg-indigo-500/[0.07] px-4 py-3">
@@ -65,23 +72,32 @@ function ResultView({ result, live }: { result: Result; live?: boolean }) {
         <p className="leading-relaxed text-indigo-50/90">{result.response}</p>
       </div>
 
+      {/* A literal miniature of the real Identity Board, not just tags. */}
       <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-4">
-        <p className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">
+        <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">
           {live ? "What your Identity Board would start tracking" : "On the Identity Board, this becomes"}
         </p>
-        <div className="flex flex-wrap gap-1.5">
-          {insights.detected_patterns.map((p) => (
-            <Chip key={p} tone="amber">
-              {p}
-            </Chip>
-          ))}
-          {insights.core_values_mentioned.map((v) => (
-            <Chip key={v} tone="indigo">
-              {v}
-            </Chip>
-          ))}
-          <Chip>{insights.emotional_tone}</Chip>
-        </div>
+
+        {value && (
+          <div className="mb-3">
+            <div className="mb-1 flex items-baseline justify-between text-sm">
+              <span className="text-zinc-200">Core value: {capitalize(value)}</span>
+              <span className="font-mono text-xs text-zinc-500">1×</span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-zinc-900">
+              <div className="h-full w-[35%] rounded-full bg-gradient-to-r from-indigo-500 to-indigo-300" />
+            </div>
+          </div>
+        )}
+
+        {pattern && (
+          <div className="mb-3 flex items-center justify-between gap-3 rounded-lg bg-zinc-900/60 px-3 py-2">
+            <span className="text-sm text-zinc-200">{pattern}</span>
+            <span className="font-mono text-xs text-zinc-500">1×</span>
+          </div>
+        )}
+
+        <Chip>{insights.emotional_tone}</Chip>
       </div>
     </div>
   );
@@ -89,7 +105,7 @@ function ResultView({ result, live }: { result: Result; live?: boolean }) {
 
 export function LiveDemo() {
   const [mode, setMode] = useState<"example" | "sandbox">("example");
-  const [activeExample, setActiveExample] = useState<Result | null>(null);
+  const [activeExample, setActiveExample] = useState<Result | null>(EXAMPLES[0]);
   const [draft, setDraft] = useState("");
   const [sandboxResult, setSandboxResult] = useState<Result | null>(null);
   const [pending, setPending] = useState(false);

@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { LiveDemo } from "@/components/LiveDemo";
 import { Reveal } from "@/components/Reveal";
 import { TrustStrip } from "@/components/TrustStrip";
+import { PLAN_LIMITS } from "@/lib/subscription";
 import { getUserId } from "@/lib/supabase/server";
 
 const STEPS = [
@@ -65,6 +66,10 @@ export default async function Home() {
             →
           </span>
         </Link>
+        <p className="mt-4 text-xs text-zinc-500">
+          Free · {PLAN_LIMITS.free.dailyEntries} reflections a day · no credit card required · works
+          on mobile &amp; desktop
+        </p>
       </section>
 
       {/* How it works */}
@@ -108,6 +113,7 @@ export default async function Home() {
               →
             </span>
           </Link>
+          <p className="mt-4 text-xs text-zinc-500">Free to start. No credit card required.</p>
         </section>
       </Reveal>
     </main>
