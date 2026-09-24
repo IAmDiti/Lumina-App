@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { LocalTime } from "@/components/LocalTime";
 import type { Entry } from "@/lib/types";
 import type { Reflection } from "@/lib/lumina/schema";
 
@@ -25,37 +26,6 @@ function writeDraft(value: string) {
   } catch {
     // Storage unavailable (private mode etc.); drafts just won't persist.
   }
-}
-
-const DATE_FORMAT: Intl.DateTimeFormatOptions = {
-  weekday: "short",
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-};
-
-// Deterministic across server and client (fixed locale + UTC), so the SSR
-// markup matches the client's first render exactly. EntryTime below upgrades
-// this to the viewer's real local time after mount, once "undefined" locale
-// (which depends on the runtime, not just the document) is safe to use.
-function formatDateStable(iso: string) {
-  return new Date(iso).toLocaleString("en-US", { ...DATE_FORMAT, timeZone: "UTC" });
-}
-
-function formatDateLocal(iso: string) {
-  return new Date(iso).toLocaleString(undefined, DATE_FORMAT);
-}
-
-function EntryTime({ iso }: { iso: string }) {
-  const [label, setLabel] = useState(() => formatDateStable(iso));
-  useEffect(() => {
-    // Upgrade to the viewer's real locale/timezone once mounted; can't run
-    // during the initial render or it would mismatch the server's output.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLabel(formatDateLocal(iso));
-  }, [iso]);
-  return <time dateTime={iso}>{label}</time>;
 }
 
 function Chip({ children, tone = "zinc" }: { children: React.ReactNode; tone?: "zinc" | "indigo" | "amber" }) {
@@ -99,7 +69,7 @@ function EntryCard({ entry, insights }: { entry: Entry; insights?: Insights | nu
   return (
     <article className="animate-fade-in rounded-2xl border border-zinc-800/80 bg-zinc-950/60 p-5 transition-colors duration-200 hover:border-zinc-700 sm:p-6">
       <header className="mb-3 flex items-center justify-between gap-3 text-xs text-zinc-500">
-        <EntryTime iso={entry.created_at} />
+        <LocalTime iso={entry.created_at} />
         {entry.emotional_tone && <Chip>{entry.emotional_tone}</Chip>}
       </header>
       <p className="whitespace-pre-wrap font-serif text-[17px] leading-relaxed text-zinc-200">{entry.raw_content}</p>

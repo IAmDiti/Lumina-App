@@ -15,9 +15,10 @@ const FREE_FEATURES = [
 ];
 
 const PAID_FEATURES = [
-  `${PLAN_LIMITS.paid.dailyEntries} reflections a day`,
+  `${PLAN_LIMITS.paid.dailyEntries} reflections a day, on a stronger model`,
   "Memory: Lumina recalls recent entries and your patterns",
   "The Identity Board — values, triggers and milestones",
+  "Weekly synthesis: throughlines across your whole journal",
 ];
 
 export default async function UpgradePage({ searchParams }: PageProps<"/upgrade">) {

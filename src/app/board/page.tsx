@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { CoreValues, EmotionalLandscape, Milestones, Patterns } from "@/components/IdentityBoard";
+import { SynthesisCard } from "@/components/SynthesisCard";
 import { loadBoard } from "@/lib/board";
 import { getPlan } from "@/lib/subscription";
 import { getUserId } from "@/lib/supabase/server";
@@ -40,7 +41,16 @@ export default async function BoardPage() {
     );
   }
 
-  const board = await loadBoard(supabase, userId);
+  const [board, { data: latestSynthesis }] = await Promise.all([
+    loadBoard(supabase, userId),
+    supabase
+      .from("syntheses")
+      .select("id, content, entry_count, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   return (
     <>
@@ -52,6 +62,9 @@ export default async function BoardPage() {
             A living picture of you, drawn from {board.entryCount}{" "}
             {board.entryCount === 1 ? "entry" : "entries"}.
           </p>
+        </div>
+        <div className="mb-5">
+          <SynthesisCard initial={latestSynthesis} entryCount={board.entryCount} />
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <div className="space-y-5">

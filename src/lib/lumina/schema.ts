@@ -18,3 +18,12 @@ export const ReflectionSchema = z.object({
 });
 
 export type Reflection = z.infer<typeof ReflectionSchema>;
+
+/** The contract for a holistic, cross-entry synthesis (Paid plan only). */
+export const SynthesisSchema = z.object({
+  synthesis: z
+    .string()
+    .describe("3-5 sentence synthesis across many entries, ending in one open question."),
+});
+
+export type Synthesis = z.infer<typeof SynthesisSchema>;

@@ -17,7 +17,7 @@ body {
     radial-gradient(40rem 22rem at 100% 0, rgb(49 46 129 / 0.2), transparent 70%),
     radial-gradient(50rem 26rem at 0% 100%, rgb(30 27 75 / 0.28), transparent 70%);
   background-attachment: fixed;
-  color: var(--color-zinc-300);
+  color: var(--color-zinc-100);
 }
 
 ::selection {

@@ -82,11 +82,15 @@ export async function POST(request: Request) {
 
   let reflection;
   try {
-    reflection = await reflect(content, {
-      profile: profileRes.data,
-      recentEntries: recentRes.data ?? [],
-      activePatterns: (patternsRes.data ?? []).map((p: { pattern_name: string }) => p.pattern_name),
-    });
+    reflection = await reflect(
+      content,
+      {
+        profile: profileRes.data,
+        recentEntries: recentRes.data ?? [],
+        activePatterns: (patternsRes.data ?? []).map((p: { pattern_name: string }) => p.pattern_name),
+      },
+      plan,
+    );
   } catch (err) {
     if (err instanceof ReflectionError) return error(err.message, err.status);
     console.error("[lumina] reflect failed", err);

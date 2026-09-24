@@ -37,3 +37,11 @@ export interface IdentityProfile {
   growth_milestones: string[];
   updated_at: string;
 }
+
+export interface Synthesis {
+  id: string;
+  user_id: string;
+  content: string;
+  entry_count: number;
+  created_at: string;
+}
