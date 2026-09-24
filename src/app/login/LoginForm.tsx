@@ -12,6 +12,24 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
   const [state, action] = useActionState<AuthState, FormData>(authenticate, {
     error: initialError,
   });
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [mismatch, setMismatch] = useState(false);
+
+  const showMismatch = mode === "signup" && confirmPassword.length > 0 && password !== confirmPassword;
+
+  function switchMode(m: "signin" | "signup") {
+    setMode(m);
+    setConfirmPassword("");
+    setMismatch(false);
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    if (mode === "signup" && password !== confirmPassword) {
+      e.preventDefault();
+      setMismatch(true);
+    }
+  }
 
   return (
     <div className="w-full">
@@ -26,7 +44,7 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
           <button
             key={m}
             type="button"
-            onClick={() => setMode(m)}
+            onClick={() => switchMode(m)}
             aria-pressed={mode === m}
             className="relative z-10 rounded-md py-2 text-zinc-400 transition-colors duration-150 aria-pressed:text-zinc-100"
           >
@@ -35,7 +53,7 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
         ))}
       </div>
 
-      <form action={action} className="space-y-4">
+      <form action={action} onSubmit={handleSubmit} className="space-y-4">
         <input type="hidden" name="mode" value={mode} />
         {next && <input type="hidden" name="next" value={next} />}
         <label className="block space-y-1.5">
@@ -47,12 +65,40 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
           <input
             name="password"
             type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setMismatch(false);
+            }}
             minLength={8}
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
             className={inputClass}
           />
         </label>
+
+        {mode === "signup" && (
+          <label className="block space-y-1.5">
+            <span className="text-sm text-zinc-400">Confirm password</span>
+            <input
+              name="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setMismatch(false);
+              }}
+              minLength={8}
+              autoComplete="new-password"
+              required
+              aria-invalid={showMismatch || mismatch}
+              className={inputClass}
+            />
+            {(showMismatch || mismatch) && (
+              <span className="block text-xs text-rose-300">Passwords don&apos;t match.</span>
+            )}
+          </label>
+        )}
 
         {state.error && (
           <p role="alert" className="animate-fade-in rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-300 ring-1 ring-rose-500/20">
