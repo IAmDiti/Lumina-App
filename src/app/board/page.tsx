@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { CoreValues, EmotionalLandscape, Milestones, Patterns } from "@/components/IdentityBoard";
+import { IdentityOverview } from "@/components/IdentityOverview";
 import { SynthesisCard } from "@/components/SynthesisCard";
 import { loadBoard } from "@/lib/board";
 import { getPlan } from "@/lib/subscription";
@@ -65,6 +66,9 @@ export default async function BoardPage() {
         </div>
         <div className="mb-5">
           <SynthesisCard initial={latestSynthesis} entryCount={board.entryCount} />
+        </div>
+        <div className="mb-5">
+          <IdentityOverview board={board} />
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <div className="space-y-5">
