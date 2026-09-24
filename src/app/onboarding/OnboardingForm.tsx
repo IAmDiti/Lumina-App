@@ -28,14 +28,14 @@ function OptionGroup({
         <span className="text-xs font-medium uppercase tracking-[0.18em] text-indigo-300/80">
           Step {step}
         </span>
-        <span className="mt-1 block font-serif text-2xl text-slate-100">{legend}</span>
-        <span className="mt-1 block text-sm text-slate-400">{description}</span>
+        <span className="mt-1 block font-serif text-2xl text-zinc-100">{legend}</span>
+        <span className="mt-1 block text-sm text-zinc-400">{description}</span>
       </legend>
       <div className="grid gap-3 sm:grid-cols-2">
         {Object.entries(options).map(([value, opt]) => (
           <label
             key={value}
-            className="group cursor-pointer rounded-xl border border-slate-800 bg-slate-900/50 p-4 transition-colors hover:border-slate-700 has-[:checked]:border-indigo-400/60 has-[:checked]:bg-indigo-500/10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-400/50"
+            className="group relative cursor-pointer rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 transition-all duration-150 hover:border-zinc-700 hover:bg-zinc-900/60 has-[:checked]:border-indigo-400/60 has-[:checked]:bg-indigo-500/10 has-[:checked]:shadow-lg has-[:checked]:shadow-indigo-950/40 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-400/50"
           >
             <input
               type="radio"
@@ -45,8 +45,16 @@ function OptionGroup({
               required
               className="sr-only"
             />
-            <span className="block font-medium text-slate-100">{opt.label}</span>
-            <span className="mt-0.5 block text-sm text-slate-400">{opt.hint}</span>
+            <span
+              aria-hidden
+              className="absolute top-4 right-4 grid size-4 place-items-center rounded-full ring-1 ring-zinc-700 transition-all duration-150 group-has-[:checked]:bg-indigo-400 group-has-[:checked]:ring-indigo-400"
+            >
+              <svg viewBox="0 0 12 12" className="size-2.5 scale-0 text-black transition-transform duration-150 group-has-[:checked]:scale-100">
+                <path d="M2 6.2l2.5 2.3L10 3" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <span className="block pr-6 font-medium text-zinc-100">{opt.label}</span>
+            <span className="mt-0.5 block pr-6 text-sm text-zinc-400">{opt.hint}</span>
           </label>
         ))}
       </div>
@@ -91,7 +99,7 @@ export function OnboardingForm({
       />
 
       {state.error && (
-        <p role="alert" className="text-sm text-rose-300">
+        <p role="alert" className="animate-fade-in text-sm text-rose-300">
           {state.error}
         </p>
       )}

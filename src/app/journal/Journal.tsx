@@ -27,19 +27,40 @@ function writeDraft(value: string) {
   }
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+const DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+};
+
+// Deterministic across server and client (fixed locale + UTC), so the SSR
+// markup matches the client's first render exactly. EntryTime below upgrades
+// this to the viewer's real local time after mount, once "undefined" locale
+// (which depends on the runtime, not just the document) is safe to use.
+function formatDateStable(iso: string) {
+  return new Date(iso).toLocaleString("en-US", { ...DATE_FORMAT, timeZone: "UTC" });
 }
 
-function Chip({ children, tone = "slate" }: { children: React.ReactNode; tone?: "slate" | "indigo" | "amber" }) {
+function formatDateLocal(iso: string) {
+  return new Date(iso).toLocaleString(undefined, DATE_FORMAT);
+}
+
+function EntryTime({ iso }: { iso: string }) {
+  const [label, setLabel] = useState(() => formatDateStable(iso));
+  useEffect(() => {
+    // Upgrade to the viewer's real locale/timezone once mounted; can't run
+    // during the initial render or it would mismatch the server's output.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLabel(formatDateLocal(iso));
+  }, [iso]);
+  return <time dateTime={iso}>{label}</time>;
+}
+
+function Chip({ children, tone = "zinc" }: { children: React.ReactNode; tone?: "zinc" | "indigo" | "amber" }) {
   const styles = {
-    slate: "bg-slate-800/70 text-slate-300 ring-slate-700/60",
+    zinc: "bg-zinc-900/70 text-zinc-300 ring-zinc-700/60",
     indigo: "bg-indigo-500/10 text-indigo-200 ring-indigo-400/25",
     amber: "bg-amber-400/10 text-amber-200 ring-amber-400/20",
   }[tone];
@@ -51,7 +72,7 @@ function LatestInsights({ insights }: { insights: Insights }) {
   return (
     <div className="mt-4 space-y-3 border-t border-indigo-400/15 pt-4 text-sm">
       {identity_board_update && (
-        <p className="text-slate-400">
+        <p className="text-zinc-400">
           <span className="mr-1.5 text-xs font-medium uppercase tracking-wider text-indigo-300/80">Board update</span>
           {identity_board_update}
         </p>
@@ -74,14 +95,14 @@ function LatestInsights({ insights }: { insights: Insights }) {
   );
 }
 
-function EntryCard({ entry, insights }: { entry: Entry; insights?: Insights }) {
+function EntryCard({ entry, insights }: { entry: Entry; insights?: Insights | null }) {
   return (
-    <article className="animate-fade-in rounded-2xl border border-slate-800 bg-slate-900/40 p-5 sm:p-6">
-      <header className="mb-3 flex items-center justify-between gap-3 text-xs text-slate-500">
-        <time dateTime={entry.created_at}>{formatDate(entry.created_at)}</time>
+    <article className="animate-fade-in rounded-2xl border border-zinc-800/80 bg-zinc-950/60 p-5 transition-colors duration-200 hover:border-zinc-700 sm:p-6">
+      <header className="mb-3 flex items-center justify-between gap-3 text-xs text-zinc-500">
+        <EntryTime iso={entry.created_at} />
         {entry.emotional_tone && <Chip>{entry.emotional_tone}</Chip>}
       </header>
-      <p className="whitespace-pre-wrap font-serif text-[17px] leading-relaxed text-slate-200">{entry.raw_content}</p>
+      <p className="whitespace-pre-wrap font-serif text-[17px] leading-relaxed text-zinc-200">{entry.raw_content}</p>
       {entry.ai_response && (
         <div className="mt-5 rounded-xl border-l-2 border-indigo-400/70 bg-indigo-500/[0.07] px-4 py-3">
           <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-indigo-300/80">Lumina</p>
@@ -98,7 +119,7 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [added, setAdded] = useState<{ entry: Entry; insights: Insights }[]>([]);
+  const [added, setAdded] = useState<{ entry: Entry; insights: Insights | null }[]>([]);
   const [, startTransition] = useTransition();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -117,7 +138,7 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
 
   const entries = useMemo(() => {
     const seen = new Set<string>();
-    const merged: { entry: Entry; insights?: Insights }[] = [];
+    const merged: { entry: Entry; insights?: Insights | null }[] = [];
     for (const item of [...added, ...initialEntries.map((entry) => ({ entry }))]) {
       if (seen.has(item.entry.id)) continue;
       seen.add(item.entry.id);
@@ -149,7 +170,7 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
         setError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
-      setAdded((prev) => [{ entry: data.entry as Entry, insights: data.insights as Insights }, ...prev]);
+      setAdded((prev) => [{ entry: data.entry as Entry, insights: data.insights as Insights | null }, ...prev]);
       setDraft("");
       writeDraft("");
       // Pull the updated Identity Board from the server.
@@ -165,12 +186,12 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
     <div className="min-w-0">
       <section aria-label="New entry" className="mb-10">
         {lastQuestion ? (
-          <p className="mb-4 font-serif text-2xl leading-snug text-slate-300 italic">{lastQuestion}</p>
+          <p className="mb-4 font-serif text-2xl leading-snug text-zinc-300 italic">{lastQuestion}</p>
         ) : (
-          <h1 className="mb-4 font-serif text-3xl text-slate-100">What&apos;s on your mind?</h1>
+          <h1 className="mb-4 font-serif text-3xl text-zinc-100">What&apos;s on your mind?</h1>
         )}
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 shadow-2xl shadow-black/30 transition focus-within:border-indigo-400/50 focus-within:ring-4 focus-within:ring-indigo-500/10">
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 shadow-2xl shadow-black/50 transition-all duration-200 focus-within:border-indigo-400/50 focus-within:ring-4 focus-within:ring-indigo-500/10">
           <label htmlFor="entry" className="sr-only">
             Journal entry
           </label>
@@ -188,17 +209,17 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
             disabled={pending}
             rows={7}
             placeholder={lastQuestion ? "Answer, or write about something else entirely…" : "Write the raw version. No one else will read this."}
-            className="block w-full resize-y rounded-t-2xl bg-transparent px-5 py-4 font-serif text-lg leading-relaxed text-slate-100 placeholder:text-slate-600 focus:outline-none disabled:opacity-60"
+            className="block w-full resize-y rounded-t-2xl bg-transparent px-5 py-4 font-serif text-lg leading-relaxed text-zinc-100 placeholder:text-zinc-600 focus:outline-none disabled:opacity-60"
           />
-          <div className="flex items-center justify-between gap-3 border-t border-slate-800/80 px-4 py-3">
-            <span className={`font-mono text-xs ${draft.length > MAX_LEN ? "text-rose-400" : "text-slate-600"}`}>
+          <div className="flex items-center justify-between gap-3 border-t border-zinc-800/80 px-4 py-3">
+            <span className={`font-mono text-xs transition-colors ${draft.length > MAX_LEN ? "text-rose-400" : "text-zinc-600"}`}>
               {draft.length > 0 ? `${draft.length.toLocaleString()} / ${MAX_LEN.toLocaleString()}` : "Ctrl/⌘ + Enter to reflect"}
             </span>
             <button
               type="button"
               onClick={() => void submit()}
               disabled={!canSubmit}
-              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-md shadow-indigo-950/40 transition-all duration-150 hover:bg-indigo-400 hover:shadow-indigo-500/30 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
             >
               {pending && <span aria-hidden className="size-2 animate-pulse rounded-full bg-white" />}
               {pending ? "Lumina is listening…" : "Reflect"}
@@ -207,7 +228,7 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
         </div>
 
         {error && (
-          <p role="alert" className="mt-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-300 ring-1 ring-rose-500/20">
+          <p role="alert" className="animate-fade-in mt-3 rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-300 ring-1 ring-rose-500/20">
             {error}
           </p>
         )}
@@ -215,7 +236,7 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
 
       <section aria-label="Past entries" className="space-y-5">
         {entries.length === 0 ? (
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-zinc-500">
             Your reflections will appear here.
           </p>
         ) : (
@@ -223,7 +244,7 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
         )}
       </section>
 
-      <p className="mt-12 text-center text-xs leading-relaxed text-slate-600">
+      <p className="mt-12 text-center text-xs leading-relaxed text-zinc-600">
         Lumina is a reflection tool, not a therapist. If you&apos;re in crisis, call or text 988 (US) or contact local emergency services.
       </p>
     </div>

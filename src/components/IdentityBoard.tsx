@@ -12,10 +12,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/45 p-5">
+    <section className="rounded-2xl border border-zinc-800/80 bg-zinc-950/60 p-5 transition-colors duration-200 hover:border-zinc-700">
       <header className="mb-4">
         <h2 className="text-xs font-medium uppercase tracking-[0.18em] text-indigo-300/80">{title}</h2>
-        {caption && <p className="mt-1 text-sm text-slate-500">{caption}</p>}
+        {caption && <p className="mt-1 text-sm text-zinc-500">{caption}</p>}
       </header>
       {children}
     </section>
@@ -23,7 +23,7 @@ function Section({
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm italic text-slate-500">{children}</p>;
+  return <p className="text-sm italic text-zinc-500">{children}</p>;
 }
 
 function capitalize(s: string) {
@@ -40,14 +40,14 @@ export function CoreValues({ values, limit }: { values: BoardData["values"]; lim
       ) : (
         <ul className="space-y-2.5">
           {shown.map((v) => (
-            <li key={v.name}>
+            <li key={v.name} className="group">
               <div className="mb-1 flex items-baseline justify-between text-sm">
-                <span className="text-slate-200">{capitalize(v.name)}</span>
-                <span className="font-mono text-xs text-slate-500">{v.count}×</span>
+                <span className="text-zinc-200 transition-colors group-hover:text-zinc-50">{capitalize(v.name)}</span>
+                <span className="font-mono text-xs text-zinc-500">{v.count}×</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+              <div className="h-1.5 overflow-hidden rounded-full bg-zinc-900">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-300"
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-indigo-300 shadow-[0_0_8px_0_rgb(129_140_248/0.5)] transition-[width] duration-500 ease-out"
                   style={{ width: `${Math.max(8, (v.count / max) * 100)}%` }}
                 />
               </div>
@@ -83,9 +83,9 @@ export function Patterns({
           {shown.map((p) => (
             <li
               key={p.id}
-              className="flex items-center justify-between gap-3 rounded-lg bg-slate-800/40 px-3 py-2"
+              className="flex items-center justify-between gap-3 rounded-lg bg-zinc-900/60 px-3 py-2 transition-colors duration-150 hover:bg-zinc-900"
             >
-              <span className="min-w-0 text-sm text-slate-200">
+              <span className="min-w-0 text-sm text-zinc-200">
                 {p.pattern_name}
                 {p.count >= 3 && (
                   <span className="ml-2 rounded-full bg-amber-400/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-300/90 ring-1 ring-amber-400/20">
@@ -94,14 +94,14 @@ export function Patterns({
                 )}
               </span>
               <span className="flex shrink-0 items-center gap-2">
-                <span className="font-mono text-xs text-slate-500">{p.count}×</span>
+                <span className="font-mono text-xs text-zinc-500">{p.count}×</span>
                 {editable && (
                   <form action={setPatternStatus}>
                     <input type="hidden" name="id" value={p.id} />
                     <input type="hidden" name="status" value="resolved" />
                     <button
                       type="submit"
-                      className="rounded-md px-2 py-1 text-xs text-slate-400 ring-1 ring-slate-700 transition-colors hover:text-emerald-300 hover:ring-emerald-500/40"
+                      className="rounded-md px-2 py-1 text-xs text-zinc-400 ring-1 ring-zinc-700 transition-all duration-150 hover:text-emerald-300 hover:ring-emerald-500/40 active:scale-95"
                     >
                       Resolve
                     </button>
@@ -115,17 +115,17 @@ export function Patterns({
 
       {editable && resolved && resolved.length > 0 && (
         <details className="mt-5 group">
-          <summary className="cursor-pointer text-sm text-slate-500 hover:text-slate-300">
+          <summary className="cursor-pointer text-sm text-zinc-500 transition-colors hover:text-zinc-300">
             Resolved ({resolved.length})
           </summary>
           <ul className="mt-3 space-y-2">
             {resolved.map((p) => (
               <li key={p.id} className="flex items-center justify-between gap-3 px-3 py-1.5">
-                <span className="text-sm text-slate-500 line-through decoration-slate-600">{p.pattern_name}</span>
+                <span className="text-sm text-zinc-500 line-through decoration-zinc-600">{p.pattern_name}</span>
                 <form action={setPatternStatus}>
                   <input type="hidden" name="id" value={p.id} />
                   <input type="hidden" name="status" value="active" />
-                  <button type="submit" className="text-xs text-slate-500 hover:text-slate-200">
+                  <button type="submit" className="text-xs text-zinc-500 transition-colors hover:text-zinc-200">
                     Reactivate
                   </button>
                 </form>
@@ -158,7 +158,7 @@ export function EmotionalLandscape({
               return (
                 <li
                   key={t.tone}
-                  className="rounded-full px-3 py-1 text-sm ring-1"
+                  className="rounded-full px-3 py-1 text-sm ring-1 transition-transform duration-150 hover:scale-105"
                   style={{
                     backgroundColor: `rgb(99 102 241 / ${0.06 + weight * 0.22})`,
                     color: `rgb(${Math.round(203 - weight * 38)} ${Math.round(213 - weight * 33)} 254)`,
@@ -174,10 +174,10 @@ export function EmotionalLandscape({
           </ul>
           {recent && recent.length > 1 && (
             <div className="mt-5">
-              <p className="mb-2 text-xs text-slate-500">Most recent first</p>
-              <ol className="flex flex-wrap gap-1.5 text-xs text-slate-400">
+              <p className="mb-2 text-xs text-zinc-500">Most recent first</p>
+              <ol className="flex flex-wrap gap-1.5 text-xs text-zinc-400">
                 {recent.map((r, i) => (
-                  <li key={`${r.date}-${i}`} className="rounded bg-slate-800/60 px-2 py-0.5" title={new Date(r.date).toLocaleString()}>
+                  <li key={`${r.date}-${i}`} className="rounded bg-zinc-900/80 px-2 py-0.5" title={new Date(r.date).toLocaleString()}>
                     {r.tone}
                   </li>
                 ))}
@@ -197,12 +197,12 @@ export function Milestones({ milestones, limit }: { milestones: string[]; limit?
       {shown.length === 0 ? (
         <Empty>Each reflection adds a line to your story.</Empty>
       ) : (
-        <ol className="relative space-y-4 border-l border-slate-800 pl-5">
+        <ol className="relative space-y-4 border-l border-zinc-800 pl-5">
           {shown.map((m, i) => (
-            <li key={i} className="relative font-serif text-[15px] leading-relaxed text-slate-300">
+            <li key={i} className="relative font-serif text-[15px] leading-relaxed text-zinc-300">
               <span
                 aria-hidden
-                className={`absolute top-2 -left-[25px] size-2 rounded-full ${i === 0 ? "bg-indigo-300 shadow-[0_0_10px_2px_rgb(129_140_248/0.5)]" : "bg-slate-700"}`}
+                className={`absolute top-2 -left-[25px] size-2 rounded-full ${i === 0 ? "animate-pulse-ring bg-indigo-300 shadow-[0_0_10px_2px_rgb(129_140_248/0.5)]" : "bg-zinc-700"}`}
               />
               {m}
             </li>
@@ -218,9 +218,9 @@ export function IdentityBoardSummary({ board }: { board: BoardData }) {
   return (
     <div className="space-y-4">
       <div className="flex items-baseline justify-between px-1">
-        <h2 className="font-serif text-xl text-slate-100">Identity Board</h2>
-        <Link href="/board" className="text-sm text-indigo-300 hover:text-indigo-200">
-          View all →
+        <h2 className="font-serif text-xl text-zinc-100">Identity Board</h2>
+        <Link href="/board" className="group text-sm text-indigo-300 transition-colors hover:text-indigo-200">
+          View all <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
         </Link>
       </div>
       <CoreValues values={board.values} limit={5} />

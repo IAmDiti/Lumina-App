@@ -26,9 +26,13 @@ export async function createClient() {
   });
 }
 
-/** Returns the signed-in user's id, or null. Verifies the JWT server-side. */
+/** Returns the signed-in user's id and email, or null. Verifies the JWT server-side. */
 export async function getUserId() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
-  return { supabase, userId: (data?.claims?.sub as string | undefined) ?? null };
+  return {
+    supabase,
+    userId: (data?.claims?.sub as string | undefined) ?? null,
+    email: (data?.claims?.email as string | undefined) ?? null,
+  };
 }

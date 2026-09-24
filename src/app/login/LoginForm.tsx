@@ -5,7 +5,7 @@ import { authenticate, type AuthState } from "./actions";
 import { SubmitButton } from "@/components/SubmitButton";
 
 const inputClass =
-  "w-full rounded-lg border border-slate-700/80 bg-slate-900/70 px-3.5 py-2.5 text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-500/25";
+  "w-full rounded-lg border border-zinc-800 bg-zinc-900/70 px-3.5 py-2.5 text-zinc-100 placeholder:text-zinc-600 outline-none transition-colors duration-150 hover:border-zinc-700 focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-500/25";
 
 export function LoginForm({ next, initialError }: { next?: string; initialError?: string }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -15,14 +15,20 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
 
   return (
     <div className="w-full">
-      <div className="mb-6 grid grid-cols-2 rounded-lg bg-slate-900/80 p-1 text-sm ring-1 ring-slate-800">
+      <div className="relative mb-6 grid grid-cols-2 rounded-lg bg-zinc-900/80 p-1 text-sm ring-1 ring-zinc-800">
+        <span
+          aria-hidden
+          className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-md bg-zinc-800 shadow-sm transition-transform duration-200 ease-out ${
+            mode === "signup" ? "translate-x-full" : "translate-x-0"
+          }`}
+        />
         {(["signin", "signup"] as const).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setMode(m)}
             aria-pressed={mode === m}
-            className="rounded-md py-2 text-slate-400 transition-colors aria-pressed:bg-slate-800 aria-pressed:text-slate-100"
+            className="relative z-10 rounded-md py-2 text-zinc-400 transition-colors duration-150 aria-pressed:text-zinc-100"
           >
             {m === "signin" ? "Sign in" : "Create account"}
           </button>
@@ -33,11 +39,11 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
         <input type="hidden" name="mode" value={mode} />
         {next && <input type="hidden" name="next" value={next} />}
         <label className="block space-y-1.5">
-          <span className="text-sm text-slate-400">Email</span>
+          <span className="text-sm text-zinc-400">Email</span>
           <input name="email" type="email" autoComplete="email" required className={inputClass} />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-sm text-slate-400">Password</span>
+          <span className="text-sm text-zinc-400">Password</span>
           <input
             name="password"
             type="password"
@@ -49,12 +55,12 @@ export function LoginForm({ next, initialError }: { next?: string; initialError?
         </label>
 
         {state.error && (
-          <p role="alert" className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-300 ring-1 ring-rose-500/20">
+          <p role="alert" className="animate-fade-in rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-300 ring-1 ring-rose-500/20">
             {state.error}
           </p>
         )}
         {state.message && (
-          <p role="status" className="rounded-lg bg-indigo-500/10 px-3 py-2 text-sm text-indigo-200 ring-1 ring-indigo-500/20">
+          <p role="status" className="animate-fade-in rounded-lg bg-indigo-500/10 px-3 py-2 text-sm text-indigo-200 ring-1 ring-indigo-500/20">
             {state.message}
           </p>
         )}
