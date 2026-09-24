@@ -28,7 +28,7 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
   const params = await searchParams;
   const justUpgraded = params.upgraded === "1";
 
-  const plan = await getPlan(supabase, userId);
+  const plan = await getPlan(supabase, userId, email);
   const checkoutUrl = plan === "paid" ? null : buildCheckoutUrl(userId, email ?? "");
 
   return (

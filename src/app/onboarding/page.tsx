@@ -8,7 +8,7 @@ import { OnboardingForm } from "./OnboardingForm";
 export const metadata: Metadata = { title: "Preferences" };
 
 export default async function OnboardingPage() {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, email } = await getUserId();
   if (!userId) redirect("/login");
 
   const [{ data: profile }, plan] = await Promise.all([
@@ -17,7 +17,7 @@ export default async function OnboardingPage() {
       .select("onboarding_focus, processing_style, reflection_tone")
       .eq("id", userId)
       .maybeSingle(),
-    getPlan(supabase, userId),
+    getPlan(supabase, userId, email),
   ]);
 
   const defaults = profile ?? { onboarding_focus: null, processing_style: null, reflection_tone: null };

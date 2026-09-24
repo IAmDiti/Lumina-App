@@ -11,10 +11,10 @@ import { getUserId } from "@/lib/supabase/server";
 export const metadata: Metadata = { title: "Identity Board" };
 
 export default async function BoardPage() {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, email } = await getUserId();
   if (!userId) redirect("/login");
 
-  const plan = await getPlan(supabase, userId);
+  const plan = await getPlan(supabase, userId, email);
 
   if (plan !== "paid") {
     return (

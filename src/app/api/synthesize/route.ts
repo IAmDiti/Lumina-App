@@ -14,10 +14,10 @@ function error(message: string, status: number) {
 }
 
 export async function POST() {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, email } = await getUserId();
   if (!userId) return error("Please sign in again.", 401);
 
-  const plan = await getPlan(supabase, userId);
+  const plan = await getPlan(supabase, userId, email);
   if (plan !== "paid") {
     return error("Synthesis is a Paid feature. Upgrade to unlock it.", 403);
   }

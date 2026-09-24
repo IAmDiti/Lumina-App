@@ -29,14 +29,14 @@ async function countSince(
 }
 
 export async function POST(request: Request) {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, email } = await getUserId();
   if (!userId) return error("Please sign in again.", 401);
 
   const parsed = BodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return error(parsed.error.issues[0]?.message ?? "Invalid entry.", 400);
   const content = parsed.data.content;
 
-  const plan = await getPlan(supabase, userId);
+  const plan = await getPlan(supabase, userId, email);
   const { dailyEntries: perDayLimit, memory } = PLAN_LIMITS[plan];
 
   const [lastMinute, lastDay] = await Promise.all([

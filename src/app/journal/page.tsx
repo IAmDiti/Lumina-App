@@ -12,7 +12,7 @@ import { Journal } from "./Journal";
 export const metadata: Metadata = { title: "Journal" };
 
 export default async function JournalPage() {
-  const { supabase, userId } = await getUserId();
+  const { supabase, userId, email } = await getUserId();
   if (!userId) redirect("/login");
 
   const [{ data: profile }, { data: entries }, plan] = await Promise.all([
@@ -22,7 +22,7 @@ export default async function JournalPage() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(30),
-    getPlan(supabase, userId),
+    getPlan(supabase, userId, email),
   ]);
 
   if (!profile?.onboarding_focus) redirect("/onboarding");
