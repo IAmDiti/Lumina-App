@@ -173,7 +173,7 @@ export function LiveDemo() {
                 <button
                   key={ex.entry}
                   type="button"
-                  onClick={() => setActiveExample(ex)}
+                  onClick={() => setActiveExample((prev) => (prev?.entry === ex.entry ? null : ex))}
                   aria-pressed={activeExample?.entry === ex.entry}
                   className="block w-full rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-left text-sm text-zinc-300 transition-colors duration-150 hover:border-zinc-700 hover:bg-zinc-900/70 aria-pressed:border-indigo-400/50 aria-pressed:bg-indigo-500/5"
                 >
