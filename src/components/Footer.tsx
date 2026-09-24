@@ -17,7 +17,7 @@ export function Footer() {
               {link.label}
             </Link>
           ))}
-          <a href="mailto:support@lumina.app" className="transition-colors hover:text-zinc-300">
+          <a href="mailto:support@luminajournal.app" className="transition-colors hover:text-zinc-300">
             Contact
           </a>
         </nav>
