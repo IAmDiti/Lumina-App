@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { LiveDemo } from "@/components/LiveDemo";
 import { Reveal } from "@/components/Reveal";
 import { TrustStrip } from "@/components/TrustStrip";
+import { FAQ } from "@/components/FAQ";
 import { PLAN_LIMITS } from "@/lib/subscription";
 import { getUserId } from "@/lib/supabase/server";
 
@@ -100,6 +101,10 @@ export default async function Home() {
       {/* Trust — right before the ask */}
       <Reveal>
         <TrustStrip />
+      </Reveal>
+
+      <Reveal>
+        <FAQ />
       </Reveal>
 
       {/* Final CTA */}
