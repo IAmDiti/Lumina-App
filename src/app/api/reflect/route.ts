@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getUserId } from "@/lib/supabase/server";
 import { reflect, ReflectionError } from "@/lib/lumina/engine";
-import { getPlan, PLAN_LIMITS } from "@/lib/subscription";
+import { formatDailyLimit, getPlan, PLAN_LIMITS } from "@/lib/subscription";
 import type { Entry } from "@/lib/types";
 
 export const maxDuration = 60;
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   if (lastDay >= perDayLimit) {
     return error(
       plan === "free"
-        ? `You've used today's ${perDayLimit} free reflections. Upgrade for up to ${PLAN_LIMITS.paid.dailyEntries} a day.`
+        ? `You've used today's ${perDayLimit} free reflections. Upgrade for ${formatDailyLimit(PLAN_LIMITS.paid.dailyEntries).toLowerCase()} reflections a day.`
         : "You've reached today's reflection limit. Try again tomorrow.",
       429,
     );

@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { ensureProtocol } from "@/lib/url";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string; message?: string };
@@ -29,7 +30,9 @@ export async function authenticate(_prev: AuthState, formData: FormData): Promis
   const supabase = await createClient();
 
   if (mode === "signup") {
-    const origin = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    const origin =
+      (await headers()).get("origin") ??
+      (process.env.NEXT_PUBLIC_SITE_URL ? ensureProtocol(process.env.NEXT_PUBLIC_SITE_URL) : "");
     const { data, error } = await supabase.auth.signUp({
       ...parsed.data,
       options: { emailRedirectTo: `${origin}/auth/confirm?next=/onboarding` },
