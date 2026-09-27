@@ -48,7 +48,7 @@ export default async function Home() {
         <p className="mb-5 text-xs font-medium uppercase tracking-[0.2em] text-indigo-300">
           A journal that listens
         </p>
-        <h1 className="font-serif text-4xl leading-tight text-white sm:text-6xl">
+        <h1 className="font-serif text-4xl leading-tight tracking-tight text-white sm:text-6xl">
           Not a diary. Not a chatbot.
           <br />
           <span className="italic text-indigo-200">A mirror.</span>
@@ -80,9 +80,11 @@ export default async function Home() {
         <div className="grid gap-4 sm:grid-cols-3">
           {STEPS.map((step, i) => (
             <Reveal key={step.title} delay={i * 120}>
-              <div className="h-full rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-indigo-400/30 hover:bg-zinc-900/50 hover:shadow-xl hover:shadow-indigo-950/40">
-                <span className="font-mono text-xs text-indigo-300/70">{String(i + 1).padStart(2, "0")}</span>
-                <h2 className="mt-2 font-serif text-xl text-white">{step.title}</h2>
+              <div className="group h-full rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-indigo-400/30 hover:bg-zinc-900/50 hover:shadow-xl hover:shadow-indigo-950/40">
+                <span className="font-serif text-4xl leading-none font-light text-zinc-700 transition-colors duration-200 group-hover:text-indigo-400/50">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h2 className="mt-3 font-serif text-xl text-white">{step.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-300">{step.body}</p>
               </div>
             </Reveal>

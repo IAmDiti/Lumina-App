@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 type Insights = {
@@ -46,18 +46,60 @@ const EXAMPLES: Result[] = [
 ];
 
 const MAX_LEN = 500;
+const THINKING_DELAY_MS = 750;
 
-function Chip({ children, tone = "zinc" }: { children: React.ReactNode; tone?: "zinc" | "indigo" | "amber" }) {
-  const styles = {
+type ChipTone = "zinc" | "indigo" | "amber" | "rose" | "sky";
+
+function Chip({ children, tone = "zinc" }: { children: React.ReactNode; tone?: ChipTone }) {
+  const styles: Record<ChipTone, string> = {
     zinc: "bg-zinc-900/70 text-zinc-300 ring-zinc-700/60",
     indigo: "bg-indigo-500/10 text-indigo-200 ring-indigo-400/25",
     amber: "bg-amber-400/10 text-amber-200 ring-amber-400/20",
-  }[tone];
-  return <span className={`rounded-full px-2.5 py-0.5 text-xs ring-1 ${styles}`}>{children}</span>;
+    rose: "bg-rose-400/10 text-rose-200 ring-rose-400/20",
+    sky: "bg-sky-400/10 text-sky-200 ring-sky-400/20",
+  };
+  return <span className={`rounded-full px-2.5 py-0.5 text-xs ring-1 ${styles[tone]}`}>{children}</span>;
+}
+
+/** Emotional tones get their own color logic instead of one flat gray chip. */
+function toneOf(tone: string): ChipTone {
+  const t = tone.toLowerCase();
+  if (/anxious|nervous|worried|scared|afraid|stressed|tense/.test(t)) return "amber";
+  if (/exhausted|tired|drained|numb|flat|overwhelmed/.test(t)) return "zinc";
+  if (/hurt|sad|lonely|grief|ashamed|guilt|rejected/.test(t)) return "rose";
+  if (/calm|hopeful|grateful|content|curious|relieved/.test(t)) return "sky";
+  if (/angry|frustrated|resentful|irritated|defensive/.test(t)) return "indigo";
+  return "zinc";
 }
 
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Small avatar echoing the Logo mark, so the response reads as a message from someone, not a UI state. */
+function LuminaAvatar() {
+  return (
+    <span
+      aria-hidden
+      className="relative mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-indigo-500/15 ring-1 ring-indigo-400/40"
+    >
+      <span className="size-2 rounded-full bg-indigo-300 shadow-[0_0_10px_3px_rgb(129_140_248/0.55)]" />
+    </span>
+  );
+}
+
+function ThinkingBubble() {
+  return (
+    <div className="animate-fade-in mt-5 flex items-center gap-3 rounded-2xl border-l-2 border-indigo-400/50 bg-indigo-500/[0.05] px-4 py-3.5">
+      <LuminaAvatar />
+      <span className="flex items-center gap-1" aria-hidden>
+        <span className="animate-typing-dot size-1.5 rounded-full bg-indigo-300/70" style={{ animationDelay: "0ms" }} />
+        <span className="animate-typing-dot size-1.5 rounded-full bg-indigo-300/70" style={{ animationDelay: "160ms" }} />
+        <span className="animate-typing-dot size-1.5 rounded-full bg-indigo-300/70" style={{ animationDelay: "320ms" }} />
+      </span>
+      <span className="text-xs text-zinc-500">Lumina is reading…</span>
+    </div>
+  );
 }
 
 function ResultView({ result, live }: { result: Result; live?: boolean }) {
@@ -67,37 +109,50 @@ function ResultView({ result, live }: { result: Result; live?: boolean }) {
 
   return (
     <div className="animate-fade-in mt-5 space-y-4">
-      <div className="rounded-xl border-l-2 border-indigo-400/70 bg-indigo-500/[0.07] px-4 py-3">
-        <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-indigo-300/80">Lumina</p>
-        <p className="leading-relaxed text-indigo-50/90">{result.response}</p>
+      {/* The response reads as a message — an avatar, a name, a reply. */}
+      <div className="flex gap-3 rounded-2xl border-l-2 border-indigo-400/70 bg-indigo-500/[0.07] px-4 py-3.5">
+        <LuminaAvatar />
+        <div className="min-w-0">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.16em] text-indigo-300/80">Lumina</p>
+          <p className="font-serif leading-relaxed text-indigo-50/90">{result.response}</p>
+        </div>
       </div>
 
-      {/* A literal miniature of the real Identity Board, not just tags. */}
+      {/* The Identity Board update reads as structured data, not more prose. */}
       <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-4">
         <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">
           {live ? "What your Identity Board would start tracking" : "On the Identity Board, this becomes"}
         </p>
 
-        {value && (
-          <div className="mb-3">
-            <div className="mb-1 flex items-baseline justify-between text-sm">
-              <span className="text-zinc-200">Core value: {capitalize(value)}</span>
-              <span className="font-mono text-xs text-zinc-500">1×</span>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {value && (
+            <div className="rounded-lg bg-zinc-900/60 px-3 py-2.5">
+              <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500">Core value</p>
+              <div className="mt-1.5 flex items-baseline justify-between gap-2">
+                <span className="text-sm text-zinc-200">{capitalize(value)}</span>
+                <span className="font-mono text-[10px] text-zinc-600">1×</span>
+              </div>
+              <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-zinc-800">
+                <div className="h-full w-[35%] rounded-full bg-gradient-to-r from-indigo-500 to-indigo-300" />
+              </div>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-zinc-900">
-              <div className="h-full w-[35%] rounded-full bg-gradient-to-r from-indigo-500 to-indigo-300" />
+          )}
+
+          {pattern && (
+            <div className="rounded-lg bg-zinc-900/60 px-3 py-2.5">
+              <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500">Pattern noticed</p>
+              <div className="mt-1.5 flex items-baseline justify-between gap-2">
+                <span className="text-sm text-zinc-200">{pattern}</span>
+                <span className="font-mono text-[10px] text-zinc-600">1×</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {pattern && (
-          <div className="mb-3 flex items-center justify-between gap-3 rounded-lg bg-zinc-900/60 px-3 py-2">
-            <span className="text-sm text-zinc-200">{pattern}</span>
-            <span className="font-mono text-xs text-zinc-500">1×</span>
-          </div>
-        )}
-
-        <Chip>{insights.emotional_tone}</Chip>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500">Tone</span>
+          <Chip tone={toneOf(insights.emotional_tone)}>{insights.emotional_tone}</Chip>
+        </div>
       </div>
     </div>
   );
@@ -105,14 +160,35 @@ function ResultView({ result, live }: { result: Result; live?: boolean }) {
 
 export function LiveDemo() {
   const [mode, setMode] = useState<"example" | "sandbox">("example");
-  const [activeExample, setActiveExample] = useState<Result | null>(EXAMPLES[0]);
+  const [selectedExample, setSelectedExample] = useState<Result | null>(null);
+  const [revealedExample, setRevealedExample] = useState<Result | null>(null);
   const [draft, setDraft] = useState("");
   const [sandboxResult, setSandboxResult] = useState<Result | null>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const thinkingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (thinkingTimeout.current) clearTimeout(thinkingTimeout.current);
+    };
+  }, []);
 
   const trimmed = draft.trim();
   const canSubmit = trimmed.length >= 3 && draft.length <= MAX_LEN && !pending;
+  const exampleThinking = selectedExample !== null && revealedExample?.entry !== selectedExample.entry;
+
+  function pickExample(ex: Result) {
+    if (thinkingTimeout.current) clearTimeout(thinkingTimeout.current);
+    if (selectedExample?.entry === ex.entry) {
+      setSelectedExample(null);
+      setRevealedExample(null);
+      return;
+    }
+    setSelectedExample(ex);
+    setRevealedExample(null);
+    thinkingTimeout.current = setTimeout(() => setRevealedExample(ex), THINKING_DELAY_MS);
+  }
 
   async function submit() {
     if (!canSubmit) return;
@@ -173,15 +249,16 @@ export function LiveDemo() {
                 <button
                   key={ex.entry}
                   type="button"
-                  onClick={() => setActiveExample((prev) => (prev?.entry === ex.entry ? null : ex))}
-                  aria-pressed={activeExample?.entry === ex.entry}
-                  className="block w-full rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-left text-sm text-zinc-300 transition-colors duration-150 hover:border-zinc-700 hover:bg-zinc-900/70 aria-pressed:border-indigo-400/50 aria-pressed:bg-indigo-500/5"
+                  onClick={() => pickExample(ex)}
+                  aria-pressed={selectedExample?.entry === ex.entry}
+                  className="block w-full rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-left font-serif text-[15px] text-zinc-300 transition-colors duration-150 hover:border-zinc-700 hover:bg-zinc-900/70 aria-pressed:border-indigo-400/50 aria-pressed:bg-indigo-500/5"
                 >
                   &ldquo;{ex.entry}&rdquo;
                 </button>
               ))}
             </div>
-            {activeExample && <ResultView result={activeExample} />}
+            {exampleThinking && <ThinkingBubble />}
+            {revealedExample && !exampleThinking && <ResultView result={revealedExample} />}
           </>
         ) : sandboxResult ? (
           <>
@@ -207,7 +284,7 @@ export function LiveDemo() {
               rows={4}
               maxLength={MAX_LEN}
               placeholder="Write a few honest sentences about something on your mind…"
-              className="block w-full resize-y rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 text-[15px] leading-relaxed text-zinc-100 placeholder:text-zinc-600 outline-none transition focus:border-indigo-400/50 focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-60"
+              className="block w-full resize-y rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 font-serif text-[15px] leading-relaxed text-zinc-100 placeholder:text-zinc-600 outline-none transition focus:border-indigo-400/50 focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-60"
             />
             <div className="mt-2 flex items-center justify-between gap-3">
               <span className="font-mono text-xs text-zinc-600">
@@ -232,7 +309,7 @@ export function LiveDemo() {
           </>
         )}
 
-        {mode === "example" && activeExample && (
+        {mode === "example" && revealedExample && !exampleThinking && (
           <p className="animate-fade-in mt-5 border-t border-zinc-800 pt-4 text-center text-sm text-zinc-400">
             This is one entry, once.{" "}
             <Link href="/login" className="text-indigo-300 hover:text-indigo-200">
