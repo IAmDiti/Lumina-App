@@ -17,7 +17,7 @@ export function buildCheckoutUrl(userId: string, email: string, interval: Billin
   if (!storeUrl || !variantId) return null;
 
   try {
-    const url = new URL(`${storeUrl.replace(/\/$/, "")}/buy/${variantId}`);
+    const url = new URL(`${storeUrl.replace(/\/$/, "")}/checkout/buy/${variantId}`);
     url.searchParams.set("checkout[email]", email);
     url.searchParams.set("checkout[custom][user_id]", userId);
 
