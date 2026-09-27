@@ -10,6 +10,7 @@ const ALL_NAV = [
   { href: "/journal", label: "Journal" },
   { href: "/board", label: "Identity Board" },
   { href: "/onboarding", label: "Preferences" },
+  { href: "/settings", label: "Settings" },
 ] as const;
 
 type NavHref = (typeof ALL_NAV)[number]["href"];

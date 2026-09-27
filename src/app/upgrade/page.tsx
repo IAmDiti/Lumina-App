@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { Logo } from "@/components/Logo";
 import { Reveal } from "@/components/Reveal";
 import { buildCheckoutUrl } from "@/lib/lumina/checkout";
 import { ANNUAL_SAVINGS_PERCENT, PRICING, TRIAL_DAYS } from "@/lib/lumina/pricing";
@@ -25,18 +25,28 @@ const PAID_FEATURES = [
 
 export default async function UpgradePage({ searchParams }: PageProps<"/upgrade">) {
   const { supabase, userId, email } = await getUserId();
-  if (!userId) redirect("/login?next=/upgrade");
-
   const params = await searchParams;
   const justUpgraded = params.upgraded === "1";
 
-  const plan = await getPlan(supabase, userId, email);
-  const checkoutUrlMonthly = plan === "paid" ? null : buildCheckoutUrl(userId, email ?? "", "monthly");
-  const checkoutUrlAnnual = plan === "paid" ? null : buildCheckoutUrl(userId, email ?? "", "annual");
+  const plan = userId ? await getPlan(supabase, userId, email) : null;
+  const checkoutUrlMonthly =
+    userId && plan !== "paid" ? buildCheckoutUrl(userId, email ?? "", "monthly") : null;
+  const checkoutUrlAnnual =
+    userId && plan !== "paid" ? buildCheckoutUrl(userId, email ?? "", "annual") : null;
+  const trialHref = userId ? null : "/login?next=/upgrade";
 
   return (
     <>
-      <AppHeader plan={plan} />
+      {plan ? (
+        <AppHeader plan={plan} />
+      ) : (
+        <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
+          <Logo />
+          <Link href="/login" className="text-sm text-zinc-300 transition-colors hover:text-white">
+            Sign in
+          </Link>
+        </header>
+      )}
       <main className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6">
         <Reveal>
           <div className="mb-10 text-center">
@@ -76,7 +86,7 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                   </li>
                 ))}
               </ul>
-              {plan !== "paid" && (
+              {plan === "free" && (
                 <p className="mt-6 rounded-lg bg-zinc-900/70 px-3 py-2 text-center text-xs text-zinc-500">
                   Your current plan
                 </p>
@@ -118,6 +128,13 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                       >
                         Start free trial
                       </a>
+                    ) : trialHref ? (
+                      <Link
+                        href={trialHref}
+                        className="mt-4 flex items-center justify-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-indigo-400 active:scale-[0.98]"
+                      >
+                        Sign up to start trial
+                      </Link>
                     ) : (
                       <p className="mt-4 rounded-lg bg-zinc-900/70 px-2 py-2 text-center text-[11px] text-zinc-500">
                         Not configured yet
@@ -145,6 +162,13 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                       >
                         Start free trial
                       </a>
+                    ) : trialHref ? (
+                      <Link
+                        href={trialHref}
+                        className="mt-3 flex items-center justify-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-indigo-400 active:scale-[0.98]"
+                      >
+                        Sign up to start trial
+                      </Link>
                     ) : (
                       <p className="mt-3 rounded-lg bg-zinc-900/70 px-2 py-2 text-center text-[11px] text-zinc-500">
                         Not configured yet
@@ -175,8 +199,8 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
         )}
 
         <p className="mt-10 text-center text-sm">
-          <Link href="/journal" className="text-zinc-400 transition-colors hover:text-zinc-100">
-            ← Back to your journal
+          <Link href={userId ? "/journal" : "/"} className="text-zinc-400 transition-colors hover:text-zinc-100">
+            {userId ? "← Back to your journal" : "← Back to Lumina"}
           </Link>
         </p>
       </main>

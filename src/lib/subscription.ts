@@ -5,7 +5,7 @@ import { isAdmin } from "@/lib/admin";
 export type Plan = "free" | "paid";
 
 export const PLAN_LIMITS: Record<Plan, { dailyEntries: number; memory: boolean }> = {
-  free: { dailyEntries: Number(process.env.LUMINA_FREE_DAILY_LIMIT ?? 5), memory: false },
+  free: { dailyEntries: Number(process.env.LUMINA_FREE_DAILY_LIMIT ?? 3), memory: false },
   // Unlimited by default; LUMINA_PAID_DAILY_LIMIT can still cap it if ever needed.
   paid: { dailyEntries: Number(process.env.LUMINA_PAID_DAILY_LIMIT ?? Infinity), memory: true },
 };
