@@ -42,9 +42,14 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
       ) : (
         <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <Logo />
-          <Link href="/login" className="text-sm text-zinc-300 transition-colors hover:text-white">
-            Sign in
-          </Link>
+          <nav className="flex items-center gap-5 text-sm">
+            <Link href="/" className="text-zinc-400 transition-colors hover:text-zinc-100">
+              Home
+            </Link>
+            <Link href="/login" className="text-zinc-300 transition-colors hover:text-white">
+              Sign in
+            </Link>
+          </nav>
         </header>
       )}
       <main className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6">
