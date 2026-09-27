@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { LocalTime } from "@/components/LocalTime";
+import { VoiceRecorder } from "@/components/VoiceRecorder";
 import type { Entry } from "@/lib/types";
 import type { Reflection } from "@/lib/lumina/schema";
 
@@ -121,6 +122,14 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
   const trimmed = draft.trim();
   const canSubmit = trimmed.length >= 3 && draft.length <= MAX_LEN && !pending;
 
+  function handleTranscript(text: string) {
+    setDraft((prev) => {
+      const joined = prev.trim() ? `${prev.trim()} ${text}` : text;
+      return joined.slice(0, MAX_LEN);
+    });
+    textareaRef.current?.focus();
+  }
+
   async function submit() {
     if (!canSubmit) return;
     setPending(true);
@@ -182,9 +191,12 @@ export function Journal({ initialEntries }: { initialEntries: Entry[] }) {
             className="block w-full resize-y rounded-t-2xl bg-transparent px-5 py-4 font-serif text-lg leading-relaxed text-zinc-100 placeholder:text-zinc-600 focus:outline-none disabled:opacity-60"
           />
           <div className="flex items-center justify-between gap-3 border-t border-zinc-800/80 px-4 py-3">
-            <span className={`font-mono text-xs transition-colors ${draft.length > MAX_LEN ? "text-rose-400" : "text-zinc-600"}`}>
-              {draft.length > 0 ? `${draft.length.toLocaleString()} / ${MAX_LEN.toLocaleString()}` : "Ctrl/⌘ + Enter to reflect"}
-            </span>
+            <div className="flex min-w-0 items-center gap-3">
+              <VoiceRecorder onTranscript={handleTranscript} disabled={pending} />
+              <span className={`font-mono text-xs transition-colors ${draft.length > MAX_LEN ? "text-rose-400" : "text-zinc-600"}`}>
+                {draft.length > 0 ? `${draft.length.toLocaleString()} / ${MAX_LEN.toLocaleString()}` : "Ctrl/⌘ + Enter to reflect"}
+              </span>
+            </div>
             <button
               type="button"
               onClick={() => void submit()}

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
 import { Reveal } from "@/components/Reveal";
 import { buildCheckoutUrl } from "@/lib/lumina/checkout";
-import { ANNUAL_SAVINGS_PERCENT, PRICING } from "@/lib/lumina/pricing";
+import { ANNUAL_SAVINGS_PERCENT, PRICING, TRIAL_DAYS } from "@/lib/lumina/pricing";
 import { PLAN_LIMITS, formatDailyLimit, getPlan } from "@/lib/subscription";
 import { getUserId } from "@/lib/supabase/server";
 
@@ -45,7 +45,10 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
               {plan === "paid" ? "You're on the Paid plan." : "Give Lumina a memory."}
             </h1>
             {plan !== "paid" && (
-              <p className="mt-3 text-zinc-400">Unlimited reflections a day, plus the Identity Board.</p>
+              <p className="mt-3 text-zinc-400">
+                Unlimited reflections a day, plus the Identity Board.{" "}
+                <span className="text-indigo-300">Starts with a {TRIAL_DAYS}-day free trial.</span>
+              </p>
             )}
           </div>
         </Reveal>
@@ -106,13 +109,14 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                       <span className="font-serif text-2xl text-white">{PRICING.monthly.label}</span>
                       <span className="text-xs text-zinc-500">/mo</span>
                     </p>
+                    <p className="mt-0.5 text-[11px] text-zinc-500">after a {TRIAL_DAYS}-day free trial</p>
                     <div className="grow" />
                     {checkoutUrlMonthly ? (
                       <a
                         href={checkoutUrlMonthly}
                         className="mt-4 flex items-center justify-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-indigo-400 active:scale-[0.98]"
                       >
-                        Upgrade
+                        Start free trial
                       </a>
                     ) : (
                       <p className="mt-4 rounded-lg bg-zinc-900/70 px-2 py-2 text-center text-[11px] text-zinc-500">
@@ -131,7 +135,7 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                       <span className="text-xs text-zinc-500">/yr</span>
                     </p>
                     <p className="mt-0.5 text-[11px] text-zinc-500">
-                      ${PRICING.annual.perMonth.toFixed(2)}/mo, billed yearly
+                      ${PRICING.annual.perMonth.toFixed(2)}/mo, billed yearly after a {TRIAL_DAYS}-day free trial
                     </p>
                     <div className="grow" />
                     {checkoutUrlAnnual ? (
@@ -139,7 +143,7 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                         href={checkoutUrlAnnual}
                         className="mt-3 flex items-center justify-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-indigo-400 active:scale-[0.98]"
                       >
-                        Upgrade
+                        Start free trial
                       </a>
                     ) : (
                       <p className="mt-3 rounded-lg bg-zinc-900/70 px-2 py-2 text-center text-[11px] text-zinc-500">
@@ -155,8 +159,10 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
 
         {plan !== "paid" && (checkoutUrlMonthly || checkoutUrlAnnual) && (
           <p className="mt-6 text-center text-xs leading-relaxed text-zinc-600">
-            Billed by Lemon Squeezy, our merchant of record. Subscriptions renew automatically
-            until cancelled. By upgrading you agree to our{" "}
+            Your {TRIAL_DAYS}-day trial is free — cancel anytime before it ends and you won&apos;t be
+            charged. If you don&apos;t cancel, your card is charged automatically when the trial
+            ends and the subscription renews each billing period after that. Billed by Lemon
+            Squeezy, our merchant of record. By starting a trial you agree to our{" "}
             <Link href="/terms" className="text-zinc-400 hover:text-zinc-200">
               Terms
             </Link>{" "}

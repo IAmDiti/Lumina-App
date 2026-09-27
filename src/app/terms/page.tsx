@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalHeader } from "@/components/LegalHeader";
+import { TRIAL_DAYS } from "@/lib/lumina/pricing";
 
 export const metadata: Metadata = { title: "Terms of Service" };
 
@@ -128,11 +129,16 @@ export default function TermsPage() {
               <strong className="text-zinc-100">Lemon Squeezy</strong>, acting as merchant of
               record. That means your payment relationship for the subscription is directly with
               Lemon Squeezy, not us — they collect payment, calculate and remit applicable sales
-              tax/VAT/GST, appear on your card statement, and handle chargebacks. Subscriptions
-              renew automatically each billing period at the then-current price until cancelled.
-              You can cancel at any time from your Lemon Squeezy receipt email or by contacting us;
-              you&apos;ll keep Paid access until the end of the period you&apos;ve already paid
-              for, and won&apos;t be charged again. See our{" "}
+              tax/VAT/GST, appear on your card statement, and handle chargebacks.
+            </p>
+            <p className="mt-3">
+              New Paid subscriptions start with a {TRIAL_DAYS}-day free trial. You won&apos;t be
+              charged during the trial, and you can cancel any time before it ends at no cost. If
+              you don&apos;t cancel, your payment method is charged automatically when the trial
+              ends, and the subscription then renews automatically each billing period at the
+              then-current price until cancelled. You can cancel at any time from your Lemon
+              Squeezy receipt email or by contacting us; cancelling stops future renewals but
+              doesn&apos;t itself refund a period you&apos;ve already been charged for. See our{" "}
               <Link href="/refunds" className="text-indigo-300 hover:text-indigo-200">
                 Refund Policy
               </Link>{" "}

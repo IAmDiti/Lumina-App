@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalHeader } from "@/components/LegalHeader";
+import { TRIAL_DAYS } from "@/lib/lumina/pricing";
 
 export const metadata: Metadata = { title: "Refund Policy" };
 
@@ -25,12 +26,24 @@ export default function RefundsPage() {
 
         <div className="mt-10 space-y-8 text-[15px] leading-relaxed text-zinc-300">
           <section>
+            <h2 className="font-serif text-xl text-zinc-100">Free trial</h2>
+            <p className="mt-3">
+              New Paid subscriptions start with a {TRIAL_DAYS}-day free trial — you&apos;re not
+              charged anything to start one. Cancel any time before the trial ends and you owe
+              nothing; there&apos;s no refund to request because no payment was ever taken. If you
+              don&apos;t cancel, your payment method is automatically charged when the trial ends,
+              which is when the guarantee below starts.
+            </p>
+          </section>
+
+          <section>
             <h2 className="font-serif text-xl text-zinc-100">14-day money-back guarantee</h2>
             <p className="mt-3">
               If Lumina&apos;s Paid plan isn&apos;t for you, email <Mail /> within 14 days of your
-              first payment and we&apos;ll issue a full refund, no questions asked. (This default
-              is easy to change — a shorter or longer window, or a different policy entirely —
-              it&apos;s just a starting point.)
+              first payment (i.e. within 14 days of your trial ending, if you didn&apos;t cancel
+              it) and we&apos;ll issue a full refund, no questions asked. (This default is easy to
+              change — a shorter or longer window, or a different policy entirely — it&apos;s just
+              a starting point.)
             </p>
           </section>
 
