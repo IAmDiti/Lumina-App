@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/AppHeader";
+import { CancelSubscriptionForm } from "@/components/CancelSubscriptionForm";
 import { DeleteAccountForm } from "@/components/DeleteAccountForm";
 import { formatDailyLimit, getPlan, PLAN_LIMITS } from "@/lib/subscription";
 import { getUserId } from "@/lib/supabase/server";
@@ -61,6 +62,11 @@ export default async function SettingsPage() {
             </Link>{" "}
             page. Billing is handled by Lemon Squeezy, our merchant of record.
           </p>
+          {plan === "paid" && (
+            <div className="mt-4">
+              <CancelSubscriptionForm />
+            </div>
+          )}
         </section>
 
         <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-950/60 p-5">

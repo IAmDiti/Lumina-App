@@ -1,12 +1,51 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { isAdmin } from "@/lib/admin";
 import { cancelSubscription } from "@/lib/lumina/lemonsqueezy";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getUserId } from "@/lib/supabase/server";
 
 export type DeleteAccountState = { error?: string };
+export type CancelSubscriptionState = { error?: string; success?: boolean };
+
+/**
+ * Cancels the signed-in user's Lemon Squeezy subscription without touching
+ * their account or data — they drop to the Free plan but keep everything
+ * they've written. Only the webhook is allowed to write `subscriptions.plan`
+ * (see the table's migration), so this doesn't update it directly; the
+ * Lemon Squeezy webhook syncs it down within a few seconds of the API call.
+ */
+export async function cancelSubscriptionAction(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- required by useActionState's action signature
+  _prev: CancelSubscriptionState,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- required by useActionState's action signature
+  _formData: FormData,
+): Promise<CancelSubscriptionState> {
+  const { supabase, userId } = await getUserId();
+  if (!userId) redirect("/login");
+
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("plan, lemonsqueezy_subscription_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (sub?.plan !== "paid" || !sub.lemonsqueezy_subscription_id) {
+    return { error: "You don't have an active paid subscription to cancel." };
+  }
+
+  const cancelled = await cancelSubscription(sub.lemonsqueezy_subscription_id);
+  if (!cancelled) {
+    return {
+      error: "Something went wrong cancelling your subscription. Please try again or email support@luminajournal.app.",
+    };
+  }
+
+  revalidatePath("/settings");
+  return { success: true };
+}
 
 /**
  * Permanently deletes the signed-in user's account: cancels any active Lemon
