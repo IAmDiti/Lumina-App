@@ -4,7 +4,7 @@ import {
   TONE_OPTIONS,
   isKeyOf,
 } from "./preferences";
-import type { Entry, UserProfile } from "@/lib/types";
+import type { Entry, Synthesis, UserProfile } from "@/lib/types";
 
 export const SYSTEM_PROMPT = `You are Lumina's Active Listener: a digital mirror for someone's private journal. You are not a chatbot, coach, therapist or advice-giver. Your job is to help the writer see their own thinking more clearly.
 
@@ -29,6 +29,9 @@ export type ReflectContext = {
   profile: Pick<UserProfile, "onboarding_focus" | "processing_style" | "reflection_tone"> | null;
   recentEntries: Pick<Entry, "raw_content" | "ai_response" | "created_at">[];
   activePatterns: string[];
+  coreValues: { name: string; count: number; last_seen_at: string }[];
+  growthMilestones: string[];
+  latestSynthesis: Pick<Synthesis, "content" | "created_at"> | null;
 };
 
 function preferenceLines(profile: ReflectContext["profile"]) {
@@ -45,6 +48,29 @@ function preferenceLines(profile: ReflectContext["profile"]) {
   return lines;
 }
 
+/** Top core values by how often they've shown up, most-mentioned first. */
+function coreValueLines(values: ReflectContext["coreValues"]) {
+  if (!values.length) return null;
+  const top = [...values].sort((a, b) => b.count - a.count).slice(0, 10);
+  return `The writer's core values, by how often they show up (most-mentioned first):\n${top
+    .map((v) => `- ${v.name} (mentioned ${v.count}×, last on ${v.last_seen_at.slice(0, 10)})`)
+    .join("\n")}`;
+}
+
+/** Most recent growth-milestone notes, oldest to newest, capped to keep the prompt lean. */
+function milestoneLines(milestones: string[]) {
+  if (!milestones.length) return null;
+  const recent = milestones.slice(-12);
+  return `What the writer has come to understand about themself so far, oldest to most recent:\n${recent
+    .map((m) => `- ${m}`)
+    .join("\n")}`;
+}
+
+function synthesisBlock(synthesis: ReflectContext["latestSynthesis"]) {
+  if (!synthesis) return null;
+  return `The last time Lumina looked across many entries at once (on ${synthesis.created_at.slice(0, 10)}), it noticed:\n${synthesis.content}`;
+}
+
 // Stop the writer's text from closing our delimiter tags early.
 export function escapeTags(text: string) {
   return text.replace(/<\/?(entry|entries|recent_entries|previous)\b[^>]*>/gi, "");
@@ -56,6 +82,15 @@ export function buildUserMessage(entry: string, ctx: ReflectContext) {
 
   const prefs = preferenceLines(ctx.profile);
   if (prefs.length) parts.push(`About the writer:\n${prefs.join("\n")}`);
+
+  const values = coreValueLines(ctx.coreValues);
+  if (values) parts.push(values);
+
+  const milestones = milestoneLines(ctx.growthMilestones);
+  if (milestones) parts.push(milestones);
+
+  const synthesis = synthesisBlock(ctx.latestSynthesis);
+  if (synthesis) parts.push(synthesis);
 
   if (ctx.activePatterns.length) {
     parts.push(

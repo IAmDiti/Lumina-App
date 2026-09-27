@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getUserId } from "@/lib/supabase/server";
 import { reflect, ReflectionError } from "@/lib/lumina/engine";
 import { formatDailyLimit, getPlan, PLAN_LIMITS } from "@/lib/subscription";
-import type { Entry } from "@/lib/types";
+import type { CoreValues, Entry } from "@/lib/types";
 
 export const maxDuration = 60;
 
@@ -55,9 +55,10 @@ export async function POST(request: Request) {
     );
   }
 
-  // Context for the Active Listener: preferences always; recent thread and
-  // known patterns ("memory") only on the paid plan.
-  const [profileRes, recentRes, patternsRes] = await Promise.all([
+  // Context for the Active Listener: preferences always; recent thread,
+  // known patterns, core values, growth history and the last synthesis
+  // ("memory") only on the paid plan.
+  const [profileRes, recentRes, patternsRes, identityRes, synthesisRes] = await Promise.all([
     supabase
       .from("users")
       .select("onboarding_focus, processing_style, reflection_tone")
@@ -78,7 +79,15 @@ export async function POST(request: Request) {
           .order("count", { ascending: false })
           .limit(25)
       : Promise.resolve({ data: [] }),
+    memory
+      ? supabase.from("identity_profile").select("core_values, growth_milestones").eq("user_id", userId).maybeSingle()
+      : Promise.resolve({ data: null }),
+    memory
+      ? supabase.from("syntheses").select("content, created_at").order("created_at", { ascending: false }).limit(1).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
+
+  const coreValues = (identityRes.data?.core_values ?? {}) as CoreValues;
 
   let reflection;
   try {
@@ -88,6 +97,13 @@ export async function POST(request: Request) {
         profile: profileRes.data,
         recentEntries: recentRes.data ?? [],
         activePatterns: (patternsRes.data ?? []).map((p: { pattern_name: string }) => p.pattern_name),
+        coreValues: Object.entries(coreValues).map(([name, v]) => ({
+          name,
+          count: v.count,
+          last_seen_at: v.last_seen_at,
+        })),
+        growthMilestones: (identityRes.data?.growth_milestones as string[] | null) ?? [],
+        latestSynthesis: synthesisRes.data ?? null,
       },
       plan,
     );

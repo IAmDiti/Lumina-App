@@ -75,7 +75,14 @@ export async function POST(request: Request) {
   try {
     const reflection = await reflect(
       parsed.data.content,
-      { profile: null, recentEntries: [], activePatterns: [] },
+      {
+        profile: null,
+        recentEntries: [],
+        activePatterns: [],
+        coreValues: [],
+        growthMilestones: [],
+        latestSynthesis: null,
+      },
       "free",
     );
     return NextResponse.json({
