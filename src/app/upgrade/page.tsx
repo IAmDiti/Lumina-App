@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
+import { CheckoutLink } from "@/components/CheckoutLink";
 import { Logo } from "@/components/Logo";
 import { Reveal } from "@/components/Reveal";
 import { buildCheckoutUrl } from "@/lib/lumina/checkout";
@@ -127,12 +128,14 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                     <p className="mt-0.5 text-[11px] text-zinc-500">after a {TRIAL_DAYS}-day free trial</p>
                     <div className="grow" />
                     {checkoutUrlMonthly ? (
-                      <a
+                      <CheckoutLink
                         href={checkoutUrlMonthly}
+                        interval="monthly"
+                        value={PRICING.monthly.amount}
                         className="mt-4 flex items-center justify-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-indigo-400 active:scale-[0.98]"
                       >
                         Start free trial
-                      </a>
+                      </CheckoutLink>
                     ) : trialHref ? (
                       <Link
                         href={trialHref}
@@ -161,12 +164,14 @@ export default async function UpgradePage({ searchParams }: PageProps<"/upgrade"
                     </p>
                     <div className="grow" />
                     {checkoutUrlAnnual ? (
-                      <a
+                      <CheckoutLink
                         href={checkoutUrlAnnual}
+                        interval="annual"
+                        value={PRICING.annual.amount}
                         className="mt-3 flex items-center justify-center rounded-lg bg-indigo-500 px-3 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-indigo-400 active:scale-[0.98]"
                       >
                         Start free trial
-                      </a>
+                      </CheckoutLink>
                     ) : trialHref ? (
                       <Link
                         href={trialHref}
