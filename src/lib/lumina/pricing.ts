@@ -5,8 +5,8 @@ export type BillingInterval = "monthly" | "annual";
 export const TRIAL_DAYS = 7;
 
 export const PRICING: Record<BillingInterval, { amount: number; label: string; perMonth: number }> = {
-  monthly: { amount: 8.99, label: "$8.99", perMonth: 8.99 },
-  annual: { amount: 86.99, label: "$86.99", perMonth: 86.99 / 12 },
+  monthly: { amount: 4.99, label: "$4.99", perMonth: 4.99 },
+  annual: { amount: 47.99, label: "$47.99", perMonth: 47.99 / 12 },
 };
 
 // Rounded whole-percent savings of annual vs. paying monthly for 12 months.
